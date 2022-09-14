@@ -47,10 +47,12 @@ export default function TabOneScreen({
   }, [loaction, errorMsg]);
 
   useEffect(() => {
-    let interval: any = setInterval(() => {
-      console.log('calling function');
+    fetchLocation();
+    console.log('punith');
+    let interval = setInterval(() => {
+      console.log('running');
       fetchLocation();
-    }, 3_00_000);
+    }, 1000 * 5 * 60);
 
     return () => {
       clearInterval(interval);
@@ -72,7 +74,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   title: {
-    fontSize: 20,
+    fontSize: 11,
     fontWeight: 'bold',
   },
   separator: {
