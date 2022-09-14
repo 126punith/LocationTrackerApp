@@ -1,8 +1,10 @@
 import * as Location from 'expo-location';
 import { useCallback, useEffect, useState } from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import { StyleSheet, View, Text, SafeAreaView } from 'react-native';
 import opencage from 'opencage-api-client';
 import { RootTabScreenProps } from '../types';
+
+import CurretLocation from '../components/CurretLocation';
 
 export default function TabOneScreen({
   navigation,
@@ -13,7 +15,7 @@ export default function TabOneScreen({
 
   let url;
 
-  const reverseGeocode = async (lat: any, long: any) => {
+  const reverseGeocode = async (lat: number, long: number) => {
     const key = '2041e9fcb53f4c1c99f231515f76d559';
     const response = await opencage.geocode({
       key,
@@ -35,13 +37,13 @@ export default function TabOneScreen({
     }
     const Myloaction = await Location.getCurrentPositionAsync();
 
-    setLocation(Myloaction.coords.latitude);
+    setLocation(Myloaction);
 
-    url = `https://api.opencagedata.com/geocode/v1/json?q=${
-      (Myloaction.coords.latitude, Myloaction.coords.longitude)
-    }&key=2041e9fcb53f4c1c99f231515f76d559&language=en`;
+    // url = `https://api.opencagedata.com/geocode/v1/json?q=${
+    //   (Myloaction.coords.latitude, Myloaction.coords.longitude)
+    // }&key=2041e9fcb53f4c1c99f231515f76d559&language=en`;
 
-    console.log(url, 'Punith');
+    console.log(Myloaction, 'Punith');
 
     reverseGeocode(Myloaction.coords.latitude, Myloaction.coords.longitude);
   }, [loaction, errorMsg]);
@@ -61,8 +63,70 @@ export default function TabOneScreen({
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>{address ? address : ''}</Text>
-      <View style={styles.separator} />
+      <SafeAreaView />
+      <Text
+        style={{
+          fontSize: 22,
+          lineHeight: 30,
+          marginLeft: 20,
+          fontWeight: '700',
+        }}
+      >
+        Location Manager
+      </Text>
+      <CurretLocation
+        address={address ? address : ''}
+        loaction={loaction}
+        timestamp={loaction ? loaction.timestamp : 0}
+      />
+      {/* <View>
+        <Text
+          style={{
+            fontSize: 16,
+            lineHeight: 22,
+            marginLeft: 20,
+            fontWeight: '600',
+            marginTop: 20,
+            marginBottom: 10,
+            paddingLeft: 10,
+          }}
+        >
+          Current Location
+        </Text>
+        <View
+          style={{
+            width: '80%',
+            height: 50,
+            flexDirection: 'row',
+            // marginTop: 20,
+            marginLeft: 20,
+          }}
+        >
+          <Image
+            source={{
+              uri: 'https://cdn.icon-icons.com/icons2/2643/PNG/512/male_boy_person_people_avatar_icon_159358.png',
+            }}
+            style={{ width: 40, height: 40, borderRadius: 20 }}
+          />
+          <View>
+            <Text style={styles.title} numberOfLines={1}>
+              {address ? address : ''}
+            </Text>
+
+            <Text
+              style={[
+                styles.title,
+                {
+                  color: Colors.silver,
+                },
+              ]}
+              numberOfLines={1}
+            >
+              {loaction && getTimeHandler(loaction.timestamp)}
+            </Text>
+          </View>
+        </View>
+      </View> */}
     </View>
   );
 }
@@ -70,16 +134,12 @@ export default function TabOneScreen({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: '#fff',
   },
   title: {
-    fontSize: 11,
-    fontWeight: 'bold',
-  },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
+    fontSize: 12,
+    lineHeight: 18,
+    fontWeight: '500',
+    paddingLeft: 10,
   },
 });
