@@ -7,4 +7,6 @@ export default {
   silver: '#b3aead',
   tint: '#c9652a',
   tabIconDefault: '#ccc',
+  blue: '#2454e3',
+  white: '#fff'
 };

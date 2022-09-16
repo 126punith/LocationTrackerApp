@@ -1,8 +1,10 @@
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { Provider } from 'react-redux';
 
 import useCachedResources from './hooks/useCachedResources';
 import Navigation from './navigation';
+import { store } from './store/store';
 
 export default function App() {
   const isLoadingComplete = useCachedResources();
@@ -11,10 +13,10 @@ export default function App() {
     return null;
   } else {
     return (
-      <SafeAreaProvider>
+      <Provider store={store}>
         <Navigation />
         <StatusBar />
-      </SafeAreaProvider>
+      </Provider>
     );
   }
 }

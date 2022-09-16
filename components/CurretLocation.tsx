@@ -6,12 +6,14 @@ import Colors from '../constants/Colors';
 
 interface CurretLocationProps {
   address: string;
-  loaction: object;
+  // loaction: object;
   timestamp: number;
 }
 
 export const CurretLocation = (props: CurretLocationProps) => {
-  const { address, loaction, timestamp } = props;
+  const { address, timestamp } = props;
+  console.log(timestamp, address);
+
   return (
     <View>
       <Text
@@ -23,6 +25,7 @@ export const CurretLocation = (props: CurretLocationProps) => {
           marginTop: 20,
           marginBottom: 10,
           paddingLeft: 10,
+          color: Colors.silver,
         }}
       >
         Current Location
@@ -56,7 +59,7 @@ export const CurretLocation = (props: CurretLocationProps) => {
             ]}
             numberOfLines={1}
           >
-            {loaction && getTimeHandler(timestamp)}
+            {timestamp && getTimeHandler(timestamp)}
           </Text>
         </View>
       </View>

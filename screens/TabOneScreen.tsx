@@ -1,21 +1,50 @@
 import * as Location from 'expo-location';
 import { useCallback, useEffect, useState } from 'react';
-import { StyleSheet, View, Text, SafeAreaView } from 'react-native';
+import {
+  StyleSheet,
+  View,
+  Text,
+  SafeAreaView,
+  TouchableOpacity,
+  FlatList,
+  Alert,
+} from 'react-native';
 import opencage from 'opencage-api-client';
-import { RootTabScreenProps } from '../types';
-
+import { loactionObject, RootTabScreenProps } from '../types';
 import CurretLocation from '../components/CurretLocation';
+import { useAppDispatch, useAppSelector } from '../hooks/hook';
+import {
+  addLoctions,
+  deleteAllLocations,
+  removeLocations,
+} from '../store/locationsSlice';
+import Colors from '../constants/Colors';
+import PrevLocations from '../components/PrevLocations';
+import uuid from 'uuid-random';
 
 export default function TabOneScreen({
   navigation,
 }: RootTabScreenProps<'TabOne'>) {
-  const [loaction, setLocation] = useState<any>();
-  const [errorMsg, setErrorMsg] = useState<string>('');
-  const [address, setAddress] = useState<string>('');
+  const dispatch = useAppDispatch();
+  const { mylocations } = useAppSelector((state) => state.locations);
+  const [location, setLocation] = useState<loactionObject>();
 
   let url;
+  let randomId = uuid();
 
-  const reverseGeocode = async (lat: number, long: number) => {
+  const removeLocationHandler = (key: string) => {
+    console.log(key, 'id to be removed');
+    dispatch(removeLocations(key));
+  };
+  const locationHandler = async () => {
+    if (location && mylocations.length <= 30) {
+      dispatch(addLoctions(location));
+    } else {
+      return;
+    }
+  };
+
+  const reverseGeocode = async (lat: number, long: number, mylocation: any) => {
     const key = '2041e9fcb53f4c1c99f231515f76d559';
     const response = await opencage.geocode({
       key,
@@ -23,110 +52,102 @@ export default function TabOneScreen({
     });
 
     const result = response.results[0];
+
     console.log(result.formatted);
-    setAddress(result.formatted);
+
+    setLocation((prev) => ({
+      ...prev,
+      id: randomId,
+      location: {
+        latitude: mylocation.coords.latitude,
+        longitude: mylocation.coords.longitude,
+      },
+      timestamp: mylocation.timestamp,
+      address: result.formatted,
+    }));
+
+    await locationHandler();
   };
 
-  const fetchLocation = useCallback(async () => {
+  const fetchLocation = async () => {
     const response = await Location.requestForegroundPermissionsAsync();
 
     // console.log(response, 'response');
 
     if (response.status !== 'granted') {
-      setErrorMsg('Permission to access loacation was denied');
+      alert(
+        'Permission to access loacation was denied, Please give permission for location'
+      );
     }
     const Myloaction = await Location.getCurrentPositionAsync();
-
-    setLocation(Myloaction);
 
     // url = `https://api.opencagedata.com/geocode/v1/json?q=${
     //   (Myloaction.coords.latitude, Myloaction.coords.longitude)
     // }&key=2041e9fcb53f4c1c99f231515f76d559&language=en`;
 
-    console.log(Myloaction, 'Punith');
+    console.log(Myloaction, location, 'Punith');
 
-    reverseGeocode(Myloaction.coords.latitude, Myloaction.coords.longitude);
-  }, [loaction, errorMsg]);
+    await reverseGeocode(
+      Myloaction.coords.latitude,
+      Myloaction.coords.longitude,
+      Myloaction
+    );
+  };
 
   useEffect(() => {
     fetchLocation();
-    console.log('punith');
+    console.log('running once');
     let interval = setInterval(() => {
       console.log('running');
       fetchLocation();
-    }, 1000 * 5 * 60);
+    }, 1000 * 1 * 60);
 
     return () => {
       clearInterval(interval);
     };
   }, []);
 
+  const deletAllHandler = () => {
+    dispatch(deleteAllLocations());
+  };
+  console.log('redux location', mylocations, mylocations.length);
   return (
     <View style={styles.container}>
       <SafeAreaView />
-      <Text
+      <Text style={styles.mainTitleText}>Location Manager</Text>
+      {mylocations.length > 0 ? (
+        <CurretLocation
+          address={
+            mylocations ? mylocations[mylocations.length - 1]?.address : null
+          }
+          timestamp={
+            mylocations ? mylocations[mylocations.length - 1]?.timestamp : null
+          }
+        />
+      ) : null}
+      <Text style={styles.title2}>Previous Locations</Text>
+      <FlatList
+        data={mylocations}
         style={{
-          fontSize: 22,
-          lineHeight: 30,
-          marginLeft: 20,
-          fontWeight: '700',
+          marginBottom: 80,
         }}
-      >
-        Location Manager
-      </Text>
-      <CurretLocation
-        address={address ? address : ''}
-        loaction={loaction}
-        timestamp={loaction ? loaction.timestamp : 0}
+        renderItem={(itemData) => {
+          return (
+            <View>
+              <PrevLocations
+                key={itemData.item.id}
+                address={itemData.item.address}
+                id={itemData.item.id}
+                timestamp={itemData.item.timestamp}
+                onRemove={removeLocationHandler}
+              />
+            </View>
+          );
+        }}
       />
-      {/* <View>
-        <Text
-          style={{
-            fontSize: 16,
-            lineHeight: 22,
-            marginLeft: 20,
-            fontWeight: '600',
-            marginTop: 20,
-            marginBottom: 10,
-            paddingLeft: 10,
-          }}
-        >
-          Current Location
-        </Text>
-        <View
-          style={{
-            width: '80%',
-            height: 50,
-            flexDirection: 'row',
-            // marginTop: 20,
-            marginLeft: 20,
-          }}
-        >
-          <Image
-            source={{
-              uri: 'https://cdn.icon-icons.com/icons2/2643/PNG/512/male_boy_person_people_avatar_icon_159358.png',
-            }}
-            style={{ width: 40, height: 40, borderRadius: 20 }}
-          />
-          <View>
-            <Text style={styles.title} numberOfLines={1}>
-              {address ? address : ''}
-            </Text>
-
-            <Text
-              style={[
-                styles.title,
-                {
-                  color: Colors.silver,
-                },
-              ]}
-              numberOfLines={1}
-            >
-              {loaction && getTimeHandler(loaction.timestamp)}
-            </Text>
-          </View>
-        </View>
-      </View> */}
+      <TouchableOpacity style={styles.button} onPress={deletAllHandler}>
+        <Text style={styles.btnText}>Clear All</Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -141,5 +162,34 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     fontWeight: '500',
     paddingLeft: 10,
+  },
+  title2: {
+    fontSize: 16,
+    lineHeight: 22,
+    marginLeft: 20,
+    fontWeight: '600',
+    paddingLeft: 10,
+    marginTop: 20,
+    color: Colors.silver,
+  },
+  mainTitleText: {
+    fontSize: 22,
+    lineHeight: 30,
+    marginLeft: 20,
+    fontWeight: '700',
+  },
+  button: {
+    position: 'absolute',
+    zIndex: 1,
+    alignSelf: 'center',
+    bottom: 30,
+    backgroundColor: Colors.blue,
+    width: '60%',
+    borderRadius: 10,
+  },
+  btnText: {
+    paddingHorizontal: 30,
+    paddingVertical: 20,
+    textAlign: 'center',
   },
 });

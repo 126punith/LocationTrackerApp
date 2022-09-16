@@ -1,7 +1,9 @@
 import { configureStore } from '@reduxjs/toolkit';
-
+import LocationsReducer from './locationsSlice';
 export const store = configureStore({
-  reducer: {},
+  reducer: {
+    locations: LocationsReducer,
+  },
 });
 
 export type RootState = ReturnType<typeof store.getState>;
