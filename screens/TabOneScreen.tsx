@@ -42,7 +42,7 @@ export default function TabOneScreen({
   };
 
   const reverseGeocode = async (lat: number, long: number, mylocation: any) => {
-    const key = '5ea54bded6444f07afdb9ecee6956d5d';
+    const key = '95663d65a69e4ac48a34cd3df541d55f';
     const response = await opencage.geocode({
       key,
       q: `${lat}, ${long}`,
@@ -67,7 +67,7 @@ export default function TabOneScreen({
   };
 
   const fetchLocation = async () => {
-    const key = '5ea54bded6444f07afdb9ecee6956d5d';
+    const key = '95663d65a69e4ac48a34cd3df541d55f';
 
     const response = await Location.requestForegroundPermissionsAsync();
 
