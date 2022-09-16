@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   FlatList,
   Alert,
+  Platform,
 } from 'react-native';
 import opencage from 'opencage-api-client';
 import { loactionObject, RootTabScreenProps } from '../types';
@@ -32,10 +33,6 @@ export default function TabOneScreen({
   let url;
   let randomId = uuid();
 
-  const removeLocationHandler = (key: string) => {
-    console.log(key, 'id to be removed');
-    dispatch(removeLocations(key));
-  };
   const locationHandler = async () => {
     if (location && mylocations.length <= 30) {
       dispatch(addLoctions(location));
@@ -45,7 +42,7 @@ export default function TabOneScreen({
   };
 
   const reverseGeocode = async (lat: number, long: number, mylocation: any) => {
-    const key = '2041e9fcb53f4c1c99f231515f76d559';
+    const key = '5ea54bded6444f07afdb9ecee6956d5d';
     const response = await opencage.geocode({
       key,
       q: `${lat}, ${long}`,
@@ -70,6 +67,8 @@ export default function TabOneScreen({
   };
 
   const fetchLocation = async () => {
+    const key = '5ea54bded6444f07afdb9ecee6956d5d';
+
     const response = await Location.requestForegroundPermissionsAsync();
 
     // console.log(response, 'response');
@@ -81,11 +80,11 @@ export default function TabOneScreen({
     }
     const Myloaction = await Location.getCurrentPositionAsync();
 
-    // url = `https://api.opencagedata.com/geocode/v1/json?q=${
-    //   (Myloaction.coords.latitude, Myloaction.coords.longitude)
-    // }&key=2041e9fcb53f4c1c99f231515f76d559&language=en`;
+    url = `https://api.opencagedata.com/geocode/v1/json?q=${
+      (Myloaction.coords.latitude, Myloaction.coords.longitude)
+    }&key=${key}&language=en`;
 
-    console.log(Myloaction, location, 'Punith');
+    console.log(Myloaction, location, url, 'Punith');
 
     await reverseGeocode(
       Myloaction.coords.latitude,
@@ -106,6 +105,11 @@ export default function TabOneScreen({
       clearInterval(interval);
     };
   }, []);
+
+  const removeLocationHandler = (key: string) => {
+    console.log(key, 'id to be removed');
+    dispatch(removeLocations(key));
+  };
 
   const deletAllHandler = () => {
     dispatch(deleteAllLocations());
@@ -177,6 +181,7 @@ const styles = StyleSheet.create({
     lineHeight: 30,
     marginLeft: 20,
     fontWeight: '700',
+    marginTop: Platform.OS === 'android' ? 30 : 0,
   },
   button: {
     position: 'absolute',
@@ -191,5 +196,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30,
     paddingVertical: 20,
     textAlign: 'center',
+    color: Colors.white,
   },
 });

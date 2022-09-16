@@ -1,19 +1,42 @@
 import { StyleSheet, View, Text } from 'react-native';
-
+import MapView, { Marker } from 'react-native-maps';
+import { useAppSelector } from '../hooks/hook';
 export default function TabTwoScreen() {
+  const { mylocations } = useAppSelector((state) => state.locations);
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Tab Two</Text>
-      <View style={styles.separator} />
-    </View>
+    <MapView
+      style={[styles.container, StyleSheet.absoluteFillObject]}
+      showsMyLocationButton={true}
+    >
+      {mylocations.length > 0 &&
+        mylocations.map((item) => {
+          console.log(item.location, mylocations.length, 'item');
+          return (
+            <>
+              <Marker
+                key={item.id}
+                coordinate={{
+                  latitude: item?.location?.latitude,
+                  longitude: item?.location?.longitude,
+                  latitudeDelta: 0.0078,
+                  longitudeDelta: 0.0078,
+                }}
+                title='My Location'
+                identifier='destination'
+              />
+            </>
+          );
+        })}
+    </MapView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    width: '100%',
+    height: '100%',
   },
   title: {
     fontSize: 20,
