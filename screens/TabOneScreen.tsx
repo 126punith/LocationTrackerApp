@@ -21,7 +21,8 @@ import {
 } from '../store/locationsSlice';
 import Colors from '../constants/Colors';
 import PrevLocations from '../components/PrevLocations';
-import uuid from 'uuid-random';
+import 'react-native-get-random-values';
+import { v4 as uuidv4 } from 'uuid';
 
 export default function TabOneScreen({
   navigation,
@@ -31,7 +32,7 @@ export default function TabOneScreen({
   const [location, setLocation] = useState<loactionObject>();
 
   let url;
-  let randomId = uuid();
+  let randomId = uuidv4();
 
   const locationHandler = async () => {
     if (location && mylocations.length <= 30) {
@@ -41,8 +42,12 @@ export default function TabOneScreen({
     }
   };
 
+  useEffect(() => {
+    locationHandler();
+  }, [location]);
+
   const reverseGeocode = async (lat: number, long: number, mylocation: any) => {
-    const key = '95663d65a69e4ac48a34cd3df541d55f';
+    const key = '8a473a10fc0c48b887cda02a14c86a82';
     const response = await opencage.geocode({
       key,
       q: `${lat}, ${long}`,
@@ -62,12 +67,10 @@ export default function TabOneScreen({
       timestamp: mylocation.timestamp,
       address: result.formatted,
     }));
-
-    await locationHandler();
   };
 
   const fetchLocation = async () => {
-    const key = '95663d65a69e4ac48a34cd3df541d55f';
+    const key = '8a473a10fc0c48b887cda02a14c86a82';
 
     const response = await Location.requestForegroundPermissionsAsync();
 
@@ -99,7 +102,7 @@ export default function TabOneScreen({
     let interval = setInterval(() => {
       console.log('running');
       fetchLocation();
-    }, 1000 * 1 * 60);
+    }, 1000 * 5 * 60);
 
     return () => {
       clearInterval(interval);
