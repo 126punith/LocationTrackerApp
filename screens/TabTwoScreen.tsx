@@ -7,32 +7,45 @@ export default function TabTwoScreen() {
 
   return (
     <>
-      {mylocations.length > 0 &&
+      {mylocations.length > 0 ? (
         mylocations.map((item) => {
-          console.log(item.location, mylocations.length, 'item');
+          let lat = item.location.latitude;
+          let long = item.location.longitude;
           return (
             <MapView
               style={[styles.container, StyleSheet.absoluteFillObject]}
               showsMyLocationButton={true}
               initialRegion={{
-                latitude: item.location.latitude,
-                longitude: item.location.longitude,
-                latitudeDelta: 0.00722,
-                longitudeDelta: 0.00721,
+                latitude: lat,
+                longitude: long,
+                latitudeDelta: 0.00922,
+                longitudeDelta: 0.00921,
               }}
             >
               <Marker
                 // key={item.id}
                 coordinate={{
-                  latitude: item.location.latitude,
-                  longitude: item.location.latitude,
+                  latitude: lat,
+                  longitude: long,
                 }}
                 title='My Location'
                 identifier='destination'
               />
             </MapView>
           );
-        })}
+        })
+      ) : (
+        <MapView
+          style={[styles.container, StyleSheet.absoluteFillObject]}
+          showsMyLocationButton={true}
+          initialRegion={{
+            latitude: 12.9716,
+            longitude: 77.5946,
+            latitudeDelta: 0.00922,
+            longitudeDelta: 0.00921,
+          }}
+        ></MapView>
+      )}
     </>
   );
 }

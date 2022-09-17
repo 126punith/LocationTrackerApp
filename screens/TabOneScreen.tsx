@@ -1,5 +1,5 @@
 import * as Location from 'expo-location';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   StyleSheet,
   View,
@@ -7,7 +7,6 @@ import {
   SafeAreaView,
   TouchableOpacity,
   FlatList,
-  Alert,
   Platform,
 } from 'react-native';
 import opencage from 'opencage-api-client';
@@ -70,11 +69,9 @@ export default function TabOneScreen({
   };
 
   const fetchLocation = async () => {
-    const key = '8a473a10fc0c48b887cda02a14c86a82';
+    // const key = '8a473a10fc0c48b887cda02a14c86a82';
 
     const response = await Location.requestForegroundPermissionsAsync();
-
-    // console.log(response, 'response');
 
     if (response.status !== 'granted') {
       alert(
@@ -83,11 +80,9 @@ export default function TabOneScreen({
     }
     const Myloaction = await Location.getCurrentPositionAsync();
 
-    url = `https://api.opencagedata.com/geocode/v1/json?q=${
-      (Myloaction.coords.latitude, Myloaction.coords.longitude)
-    }&key=${key}&language=en`;
-
-    console.log(Myloaction, location, url, 'Punith');
+    // url = `https://api.opencagedata.com/geocode/v1/json?q=${
+    //   (Myloaction.coords.latitude, Myloaction.coords.longitude)
+    // }&key=${key}&language=en`;
 
     await reverseGeocode(
       Myloaction.coords.latitude,
@@ -98,9 +93,7 @@ export default function TabOneScreen({
 
   useEffect(() => {
     fetchLocation();
-    console.log('running once');
     let interval = setInterval(() => {
-      console.log('running');
       fetchLocation();
     }, 1000 * 5 * 60);
 
@@ -110,14 +103,14 @@ export default function TabOneScreen({
   }, []);
 
   const removeLocationHandler = (key: string) => {
-    console.log(key, 'id to be removed');
+    // console.log(key, 'id to be removed');
     dispatch(removeLocations(key));
   };
 
   const deletAllHandler = () => {
     dispatch(deleteAllLocations());
   };
-  console.log('redux location', mylocations, mylocations.length);
+  // console.log('redux store', mylocations, mylocations.length);
   return (
     <View style={styles.container}>
       <SafeAreaView />
@@ -138,19 +131,15 @@ export default function TabOneScreen({
         style={{
           marginBottom: 80,
         }}
-        renderItem={(itemData) => {
-          return (
-            <View>
-              <PrevLocations
-                key={itemData.item.id}
-                address={itemData.item.address}
-                id={itemData.item.id}
-                timestamp={itemData.item.timestamp}
-                onRemove={removeLocationHandler}
-              />
-            </View>
-          );
-        }}
+        renderItem={(itemData) => (
+          <PrevLocations
+            key={itemData.item.id}
+            address={itemData.item.address}
+            id={itemData.item.id}
+            timestamp={itemData.item.timestamp}
+            onRemove={removeLocationHandler}
+          />
+        )}
       />
       <TouchableOpacity style={styles.button} onPress={deletAllHandler}>
         <Text style={styles.btnText}>Clear All</Text>
