@@ -1,6 +1,7 @@
 import { StyleSheet, View, Text } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import { useAppSelector } from '../hooks/hook';
+
 export default function TabTwoScreen() {
   const { mylocations } = useAppSelector((state) => state.locations);
 
@@ -23,8 +24,8 @@ export default function TabTwoScreen() {
               <Marker
                 // key={item.id}
                 coordinate={{
-                  latitude: 37.785834,
-                  longitude: -122.406417,
+                  latitude: item.location.latitude,
+                  longitude: item.location.latitude,
                 }}
                 title='My Location'
                 identifier='destination'
